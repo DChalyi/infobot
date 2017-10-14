@@ -2,9 +2,32 @@ package main
 import (
 	"gopkg.in/telegram-bot-api.v4"
 	"log"
+	"io/ioutil"
+	"fmt"
+	"os"
 )
 
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
 func main() {
+	dat, err := ioutil.ReadFile("/tmp/dat")
+	check(err)
+	fmt.Print(string(dat))
+
+	f, err := os.Open("/tmp/dat")
+	check(err)
+
+	var sName, number string
+	_,err:=f.Read(sName)
+	_,err:=f.Read(number)
+
+
+	var mapmap = map[string]string{}
+
 	// подключаемся к боту с помощью токена
 	bot, err := tgbotapi.NewBotAPI("442632858:AAGT6aDU-axkUJIyQ1M6dmAwNustMGfcPEA")
 	if err != nil {
