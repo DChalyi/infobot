@@ -1,10 +1,10 @@
 package main
+
 import (
 	"gopkg.in/telegram-bot-api.v4"
 	"log"
 	"io/ioutil"
-	"fmt"
-	"os"
+	"strings"
 )
 
 func check(e error) {
@@ -14,20 +14,17 @@ func check(e error) {
 }
 
 func main() {
-	dat, err := ioutil.ReadFile("/tmp/dat")
+	// считываем в один стринг весь файл и сплитим на слайсы
+	dat, err := ioutil.ReadFile("C:\\Users\\Chalyi\\Desktop\\BEST\\IT_dept\\infobot\\numbers")
 	check(err)
-	fmt.Print(string(dat))
+	premapinfo := strings.Fields(string(dat))
 
-	f, err := os.Open("/tmp/dat")
-	check(err)
-
-	var sName, number string
-	_,err:=f.Read(sName)
-	_,err:=f.Read(number)
-
-
-	var mapmap = map[string]string{}
-
+	// заполняем мап
+	var mapmap map[string]string
+	mapmap=make(map[string]string)
+	for i := 0; i < len(premapinfo); i+=2 {
+		mapmap[premapinfo[i]] = premapinfo[i+1]
+	}
 	// подключаемся к боту с помощью токена
 	bot, err := tgbotapi.NewBotAPI("442632858:AAGT6aDU-axkUJIyQ1M6dmAwNustMGfcPEA")
 	if err != nil {
@@ -43,7 +40,7 @@ func main() {
 	updates, _ := bot.GetUpdatesChan(ucfg)
 	// читаем обновления из канала
 	for {
-		for update := range updates{
+		for update := range updates {
 			// Пользователь, который написал боту
 			if update.Message == nil {
 				continue
@@ -60,11 +57,16 @@ func main() {
 
 			log.Printf("[%s] %d %s", UserName, ChatID, Text)
 
+			// в зависимости от команды - выводим имя из мапки или всю инфу
 			switch update.Message.Command() {
 			case "get":
-				reply := "Привет. Я телеграм-бот"
-				msg:=tgbotapi.NewMessage(ChatID, reply)
+				reply := mapmap[update.Message.CommandArguments()]
+				msg := tgbotapi.NewMessage(ChatID, reply)
 				bot.Send(msg)
+			case "all":
+				for i := 0; i < len(premapinfo); i+=2{
+					bot.Send(tgbotapi.NewMessage(ChatID,"Name: " + premapinfo[i]+"; Phone: "+premapinfo[i+1]))
+				}
 			}
 
 			// Ответим пользователю его же сообщением
