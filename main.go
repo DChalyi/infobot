@@ -8,9 +8,10 @@ import (
 	"bufio"
 	"io"
 )
+
 type Person struct {
 	lastname string
-	info string
+	info     string
 }
 
 func check(e error) {
@@ -35,13 +36,13 @@ func main() {
 		}
 		activemembers = append(activemembers, Person{
 			lastname: line[0],
-			info:  line[1],
+			info:     line[1],
 		})
 	}
 	// заполняем мап
 	//var mapmap map[string]*Person
-	mapmap:=make(map[string]*Person)
-	for i := 0; i < len(activemembers); i++{
+	mapmap := make(map[string]*Person)
+	for i := 0; i < len(activemembers); i++ {
 		mapmap[activemembers[i].lastname] = &activemembers[i]
 	}
 	// подключаемся к боту с помощью токена
@@ -83,8 +84,8 @@ func main() {
 				msg := tgbotapi.NewMessage(ChatID, reply)
 				bot.Send(msg)
 			case "all":
-				for i := 0; i < len(activemembers); i++{
-					bot.Send(tgbotapi.NewMessage(ChatID,"Name: " + activemembers[i].lastname+"; Phone: "+activemembers[i].info))
+				for i := 0; i < len(activemembers); i++ {
+					bot.Send(tgbotapi.NewMessage(ChatID, "Name: "+activemembers[i].lastname+"; Phone: "+activemembers[i].info))
 				}
 			}
 
