@@ -78,15 +78,33 @@ func main() {
 			log.Printf("[%s] %d %s", UserName, ChatID, Text)
 
 			// в зависимости от команды - выводим имя из мапки или всю инфу
+			var reply string
 			switch update.Message.Command() {
 			case "get":
-				reply := mapmap[update.Message.CommandArguments()].info
+				if update.Message.CommandArguments()==""{
+					msg := tgbotapi.NewMessage(ChatID, "Empty command")
+					bot.Send(msg)
+					break
+				}
+				searchedUser, userExist := mapmap[update.Message.CommandArguments()]
+				if userExist {
+					reply =searchedUser.info
+
+				} else {
+					reply = "No user found"
+				}
 				msg := tgbotapi.NewMessage(ChatID, reply)
 				bot.Send(msg)
 			case "all":
-				for i := 0; i < len(activemembers); i++ {
-					bot.Send(tgbotapi.NewMessage(ChatID, "Name: "+activemembers[i].lastname+"; Phone: "+activemembers[i].info))
+				var allMessage string
+				for membKey, member := range activemembers{
+					allMessage+= "Name: "+member.lastname+"; Phone: "+member.info+" \n"
+					if (membKey+1)%20==0{
+						bot.Send(tgbotapi.NewMessage(ChatID,allMessage))
+						allMessage=""
+					}
 				}
+				bot.Send(tgbotapi.NewMessage(ChatID,allMessage))
 			}
 
 			// Ответим пользователю его же сообщением
